@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Last 48 Hours Readings</title>
+</head>
+<body>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+	<script type="text/javascript">
+	jQuery.noConflict();
+	</script>
+	<script src="http://code.highcharts.com/highcharts.js"></script>
+	<script src="http://code.highcharts.com/modules/exporting.js"></script>
+
+	<div id="graph" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js" type="text/javascript"></script>
+	<script> 
+	var chart; 
+	$(document).ready(function() {
+	    Highcharts.setOptions({
+	        global: {
+	            useUTC: true
+	        }
+
+	    });
+	    chart = new Highcharts.Chart({
+	     chart: {
+	        renderTo: 'graph',
+	        type: 'spline',
+		zoomType: 'x',
+	        spacingRight: 20,
+
+	     },
+	     title: {
+	        text: 'Letture ultime 48 ore'
+	     },
+	     xAxis: {
+	        type: 'datetime',
+
+	     },
+	     yAxis: {
+	        minPadding: 0.2,
+	            
+	            title: {
+	                text: 'Temperatura (c°)',
+	            
+	            }
+	     },
+	     tooltip: {
+	                shared: true,
+					xDateFormat: '%d/%m/%Y %H:%M:%S' 
+	            },
+	      legend: {
+	                enabled: false
+	            },
+	     plotOptions: {
+	                area: {   
+	                    fillColor: {
+	                        linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1},
+	                        stops: [
+	                            [0, "#FF0000"],
+	                            [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(10).get('rgba')]
+	                        ]
+	                    },   
+	                    lineWidth: 1,
+	                    marker: {
+	                        enabled: false
+	                    },
+	                    shadow: false,
+	                    states: {
+	                        hover: {
+	                            lineWidth: 1
+	                        }
+	                    },   
+	                    threshold: null
+	                }
+	            },
+	     series: [{
+		 type: 'area',
+		 name: 'Temperatura in gradi centigradi',
+		   pointInterval: 24 * 3600 * 1000,
+	        data: [],
+	     }]
+	  });
+	  handleRefresh();
+	  setInterval(handleRefresh, 60000);
+	  });
+	function updateMeteoReadings(sales) {
+	var array1 = new Array();
+	var array = new Array();
+	chart.series[0].setData([]);
+		for (var i=0;i<sales.length;i++)
+		{
+			var anno=sales[i].data.substring(0,4);
+			var mese=sales[i].data.substring(5,7);
+			var giorno=sales[i].data.substring(8,10);
+			var ora=sales[i].data.substring(11,13);
+			var minuti=sales[i].data.substring(14,16);
+			
+			array[i]=[Date.UTC(anno,mese-1,giorno,ora,minuti),eval(sales[i].temperatura_esterna)];
+
+		}array1[0]=array;
+	chart.series[0].setData(array,true);
+	}
+
+	function handleRefresh() {
+			var url ="http://192.34.62.109:8080/WeatherStation/MeteoServices/Readings/last48HReadings/updateMeteoReadings?filtro=35";
+			var newScriptElement = document.createElement("script");
+			newScriptElement.setAttribute("src",url);
+			newScriptElement.setAttribute("id","jsonp");
+			
+			var oldScriptElement = document.getElementById("jsonp");
+			var head = document.getElementsByTagName("head")[0];
+			if (oldScriptElement == null) {
+				head.appendChild(newScriptElement);
+			}
+			else {
+				head.replaceChild(newScriptElement, oldScriptElement);	
+			}
+		}
+	  </script>
+</body>
+</html>

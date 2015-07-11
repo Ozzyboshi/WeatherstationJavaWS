@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Weatherstation WebServices</title>
+<style>canvas { border: 1px solid black;background-color: #EBEBEB; border-radius: 10px 10px 10px 10px; } </style>
+</head>
+<body>
+
+<p><canvas id=termometro width=150 height=700></canvas></p>
+
+<script src="js/Termometro.js"></script>
+
+<script>
+	window.onload = function () {
+		parametri.margineX=50;
+		parametri.margineY=50;
+		parametri.pixelsPerGrado=10;
+		parametri.height=550;
+		disegnatermometro("termometro",true);
+		var url="http://meteo.ozzyboshi.com:8888/WeatherStation/MeteoServices/Readings/lastReading/updateMeteoReadings?filtro=35";
+		handleRefresh(url);
+		setInterval(function() {handleRefresh(url)}, 18000);
+	};
+	
+	
+	
+</script>
+<div id=sales></div>
+</body>
+</html>
