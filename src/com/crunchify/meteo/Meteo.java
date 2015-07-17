@@ -73,7 +73,7 @@ public class Meteo {
 			tz="Europe/Rome";
 		
 		Class.forName("com.mysql.jdbc.Driver").newInstance();
-		Connection db = DriverManager.getConnection("jdbc:mysql://"+host+"/" + "meteo"+"?user="+user+"&password="+password);
+		Connection db = getWeatherConnectionObject();
 		Statement stmt =  (Statement) db.createStatement();
 		if (period==null || period.length()==0)
 			stmt.executeQuery("select left(CONVERT_TZ(data,'UTC','"+tz+"'),"+length+") as data ,sum(pioggia_parziale) as pioggia,avg(temperatura_esterna) as temp_esterna_media from meteo.letture where left(CONVERT_TZ(data,'UTC','"+tz+"'),"+length+")>left(now() - interval "+days+" "+timeunitstr+","+length+") group by left(CONVERT_TZ(data,'UTC','"+tz+"'),"+length+") order by data desc");
@@ -96,7 +96,7 @@ public class Meteo {
 	
 	private JSONObject getLastRainfallDay() throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, JSONException {
 		Class.forName("com.mysql.jdbc.Driver").newInstance();
-		Connection db = DriverManager.getConnection("jdbc:mysql://"+host+"/" + "meteo"+"?user="+user+"&password="+password);
+		Connection db = getWeatherConnectionObject();
 		Statement stmt =  (Statement) db.createStatement();
 		stmt.executeQuery("select * from (SELECT (@statusPre <> pioggia_totale) AS statusChanged , @statusPre := pioggia_totale,id,data from meteo.letture , (SELECT @statusPre:=NULL) AS d  order by data) as good where statusChanged order by id desc limit 1");
 		ResultSet rs = stmt.getResultSet ();
