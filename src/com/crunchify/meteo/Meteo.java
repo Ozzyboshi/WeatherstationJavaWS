@@ -115,7 +115,7 @@ public class Meteo {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getLastNReadings(@PathParam("f") String f,@DefaultValue("2") @QueryParam("step") int step) throws JSONException, SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
 		Class.forName("com.mysql.jdbc.Driver").newInstance();
-		Connection db = DriverManager.getConnection("jdbc:mysql://"+host+"/" + "meteo"+"?user="+user+"&password="+password);
+		Connection db = getWeatherConnectionObject();
 		
 		Statement stmt =  (Statement) db.createStatement();
 		stmt.executeQuery("SELECT * FROM letture order by data desc limit "+step);
@@ -150,7 +150,7 @@ public class Meteo {
 		
 		JSONObject jsonObject = new JSONObject();
 		Class.forName("com.mysql.jdbc.Driver").newInstance();
-		Connection db = DriverManager.getConnection("jdbc:mysql://"+host+"/" + "meteo"+"?user="+user+"&password="+password);
+		Connection db = getWeatherConnectionObject();
 		Statement stmt =  (Statement) db.createStatement();
 		stmt.executeQuery("SELECT * FROM letture where left(data,10)=left(now(),10) order by "+step+" limit 1");
 		ResultSet rs = stmt.getResultSet ();
@@ -168,7 +168,7 @@ public class Meteo {
 		
 		JSONObject jsonObject = new JSONObject();
 		Class.forName("com.mysql.jdbc.Driver").newInstance();
-		Connection db = DriverManager.getConnection("jdbc:mysql://"+host+"/" + "meteo"+"?user="+user+"&password="+password);
+		Connection db = getWeatherConnectionObject();
 		Statement stmt =  (Statement) db.createStatement();
 		stmt.executeQuery("SELECT * FROM letture where left(data,10)=left(now(),10) order by "+step+" desc limit 1");
 		ResultSet rs = stmt.getResultSet ();
@@ -185,7 +185,7 @@ public class Meteo {
 		if (tz.contains("'"))
 			tz="Europe/Rome";
 		Class.forName("com.mysql.jdbc.Driver").newInstance();
-		Connection db = DriverManager.getConnection("jdbc:mysql://"+host+"/" + "meteo"+"?user="+user+"&password="+password);
+		Connection db = getWeatherConnectionObject();
 		
 		Statement stmt =  (Statement) db.createStatement();
 		stmt.executeQuery("SELECT "+getMysqlFields()+" FROM letture where left(CONVERT_TZ(data,'UTC','"+tz+"'),10)='"+date+"' order by data desc");
@@ -208,7 +208,7 @@ public class Meteo {
 	public String getLastWeekReadings(@PathParam("f") String f,@DefaultValue("2") @QueryParam("filtro") int filtro) throws JSONException, SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
 
 		Class.forName("com.mysql.jdbc.Driver").newInstance();
-		Connection db = DriverManager.getConnection("jdbc:mysql://"+host+"/" + "meteo"+"?user="+user+"&password="+password);
+		Connection db = getWeatherConnectionObject();
 		
 		Statement stmt =  (Statement) db.createStatement();
 		stmt.executeQuery("SELECT "+getMysqlFields()+" FROM letture where data between now()-interval 7 day and now() order by data desc");
@@ -252,7 +252,7 @@ public class Meteo {
 		if (nhours>240)
 			nhours=240;
 		Class.forName("com.mysql.jdbc.Driver").newInstance();
-		Connection db = DriverManager.getConnection("jdbc:mysql://"+host+"/" + "meteo"+"?user="+user+"&password="+password);
+		Connection db = getWeatherConnectionObject();
 		
 		Statement stmt =  (Statement) db.createStatement();
 		stmt.executeQuery("SELECT "+getMysqlFields()+" FROM letture where data between now()-interval "+nhours+" hour and now() order by data desc");
