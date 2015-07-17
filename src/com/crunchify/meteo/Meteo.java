@@ -23,9 +23,14 @@ import javax.ws.rs.core.MediaType;
 @Path("/Readings")
 public class Meteo {
 	
-	private final String user = System.getenv("MYSQL_DATABASE");
+	private final String user = System.getenv("MYSQL_USER");
+	private final String database = System.getenv("MYSQL_DATABASE");
 	private final String password = System.getenv("MYSQL_PASSWORD");
 	private final String host = "db";
+	
+	private Connection getWeatherConnectionObject() throws SQLException {
+		return DriverManager.getConnection("jdbc:mysql://"+host+"/" + database+"?user="+user+"&password="+password);
+	}
 	
 	@Path("/lastReading/{f}")
     @GET
@@ -33,7 +38,7 @@ public class Meteo {
     public String getLastReading(@PathParam("f") String f,@DefaultValue("0") @QueryParam("filtro") int filtro) throws JSONException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException {
 		JSONObject jsonObject = new JSONObject();
 		Class.forName("com.mysql.jdbc.Driver").newInstance();
-		Connection db = DriverManager.getConnection("jdbc:mysql://"+host+"/" + "meteo"+"?user="+user+"&password="+password);
+		Connection db = getWeatherConnectionObject();
 		Statement stmt =  (Statement) db.createStatement();
 		stmt.executeQuery("SELECT "+getMysqlFields()+" FROM letture order by data desc limit 1");
 		ResultSet rs = stmt.getResultSet ();
