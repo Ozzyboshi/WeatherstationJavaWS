@@ -26,7 +26,7 @@ public class Meteo {
 	private final String user = System.getenv("MYSQL_USER");
 	private final String database = System.getenv("MYSQL_DATABASE");
 	private final String password = System.getenv("MYSQL_PASSWORD");
-	private final String host = "db";
+	private final String host = System.getenv("MYSQL_HOST");
 	
 	private Connection getWeatherConnectionObject() throws SQLException {
 		return DriverManager.getConnection("jdbc:mysql://"+host+"/" + database+"?user="+user+"&password="+password);
