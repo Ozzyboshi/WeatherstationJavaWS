@@ -238,6 +238,13 @@ public class Meteo {
 		return getLastXHReadings(f, filtro, 48);
 	}
 	
+	@Path("/last72HReadings/{f}")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getLast72HReadings(@PathParam("f") String f,@DefaultValue("2") @QueryParam("filtro") int filtro) throws JSONException, SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+		return getLastXHReadings(f, filtro, 72);
+	}
+	
 	@Path("/last96HReadings/{f}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
