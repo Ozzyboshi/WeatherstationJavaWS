@@ -27,10 +27,40 @@ public class Meteo {
 	private final String database = System.getenv("MYSQL_DATABASE");
 	private final String password = System.getenv("MYSQL_PASSWORD");
 	private final String host = System.getenv("MYSQL_HOST");
+	private Connection persistentConnection = null;
 	
 	private Connection getWeatherConnectionObject() throws SQLException {
-		return DriverManager.getConnection("jdbc:mysql://"+host+"/" + database+"?user="+user+"&password="+password);
+		String connectionString = "jdbc:mysql://"+host+"/" + database+"?user="+user+"&password="+password;
+		return DriverManager.getConnection(connectionString);
 	}
+	
+	private Connection getWeatherPersistentConnectionObject() throws SQLException {
+		if (persistentConnection!=null)
+			return persistentConnection;
+		String connectionString = "jdbc:mysql://"+host+"/" + database+"?user="+user+"&password="+password;
+		persistentConnection = DriverManager.getConnection(connectionString);;
+		return persistentConnection;
+	}
+	
+	@Path("/lastReading")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getLastReading(@DefaultValue("0") @QueryParam("filtro") int filtro) throws JSONException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException {
+		JSONObject jsonObject = new JSONObject();
+		Class.forName("com.mysql.jdbc.Driver").newInstance();
+		Connection db = getWeatherPersistentConnectionObject();
+		Statement stmt =  (Statement) db.createStatement();
+		stmt.executeQuery("SELECT "+getMysqlFields()+" FROM letture order by data desc limit 1");
+		ResultSet rs = stmt.getResultSet ();
+		while (rs.next ()){
+			getFilteredMysqlData(jsonObject,rs,filtro);
+		}
+
+		jsonObject.put("day_data", getLastRainfallsAndAvgTempData(10,1,"Europe/Rome",1,null));
+		jsonObject.put("last_rainfall_data", getLastRainfallDay());
+		db.close();
+		return jsonObject.toString();
+    }
 	
 	@Path("/lastReading/{f}")
     @GET
