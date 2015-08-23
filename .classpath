@@ -12,5 +12,6 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jersey-bundle-1.14.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/json.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/mysql-connector-java-5.1.25-bin.jar"/>
+	<classpathentry kind="lib" path="libs/wm.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
