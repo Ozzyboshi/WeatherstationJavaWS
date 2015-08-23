@@ -1,10 +1,16 @@
 package com.crunchify.meteo;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.imageio.ImageIO;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -17,8 +23,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.mysql.jdbc.Statement;
+import com.ozzyboshi.worldmap.ImageSizeDifferentException;
+import com.ozzyboshi.worldmap.WorldMapDrawable;
+import com.ozzyboshi.worldmap.WorldMapMaker;
+import com.ozzyboshi.worldmap.awt.WorldMapAwtDraw;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 @Path("/Readings")
 public class Meteo {
@@ -341,5 +352,54 @@ public class Meteo {
 			virgola=",";
 		}
 		return output;
+	}
+	
+	@Path("/WorldImage")
+    @GET
+    @Produces("image/png")
+	public Response getImage() {
+		
+		WorldMapDrawable<Object, Object> image = new WorldMapAwtDraw();
+		
+		image.setDayImageFile(new File("images/day.png"));
+		image.setNightImageFile(new File("images/night.png"));
+		try {
+			WorldMapMaker maker = new WorldMapMaker(image, true, false);
+			maker.BuildMapFromUnixTimestamp(System.currentTimeMillis()/1000L);
+			
+			
+			//System.out.println(output);
+			//ImageIO.write(output, "PNG", new File("images/awtoutput2.png"));
+		}
+		catch (ImageSizeDifferentException e) {
+			e.printStackTrace();
+		}
+		
+		// uncomment line below to send non-streamed
+	    // return Response.ok(imageData).build();
+
+	    // uncomment line below to send streamed
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		BufferedImage output = (BufferedImage) image.getDestination();
+		try {
+			ImageIO.write( output, "PNG", baos );
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			baos.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		byte[] imageInByte = baos.toByteArray();
+		try {
+			baos.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    return Response.ok(new ByteArrayInputStream(imageInByte)).build();
 	}
 }
