@@ -5,6 +5,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -360,16 +363,14 @@ public class Meteo {
 	public Response getImage() {
 		
 		WorldMapDrawable<Object, Object> image = new WorldMapAwtDraw();
+		image.setDayImageInputStream(Meteo.class.getResourceAsStream("/images/day.png"));
+		image.setNightImageInputStream(Meteo.class.getResourceAsStream("/images/night.png"));
 		
-		image.setDayImageFile(new File("images/day.png"));
-		image.setNightImageFile(new File("images/night.png"));
+			
+		
 		try {
 			WorldMapMaker maker = new WorldMapMaker(image, true, false);
 			maker.BuildMapFromUnixTimestamp(System.currentTimeMillis()/1000L);
-			
-			
-			//System.out.println(output);
-			//ImageIO.write(output, "PNG", new File("images/awtoutput2.png"));
 		}
 		catch (ImageSizeDifferentException e) {
 			e.printStackTrace();
