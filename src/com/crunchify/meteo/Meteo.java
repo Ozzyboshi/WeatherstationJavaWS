@@ -3,11 +3,8 @@ package com.crunchify.meteo;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -366,8 +363,6 @@ public class Meteo {
 		image.setDayImageInputStream(Meteo.class.getResourceAsStream("/images/day.png"));
 		image.setNightImageInputStream(Meteo.class.getResourceAsStream("/images/night.png"));
 		
-			
-		
 		try {
 			WorldMapMaker maker = new WorldMapMaker(image, true, false);
 			maker.BuildMapFromUnixTimestamp(System.currentTimeMillis()/1000L);
@@ -391,16 +386,15 @@ public class Meteo {
 		try {
 			baos.flush();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		byte[] imageInByte = baos.toByteArray();
 		try {
 			baos.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	    return Response.ok(new ByteArrayInputStream(imageInByte)).build();
+		
+		return Response.ok(new ByteArrayInputStream(imageInByte)).header("Cache-Control", "no-cache").header("Pragma", "no-cache").build();
 	}
 }
